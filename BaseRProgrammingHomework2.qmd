@@ -1,0 +1,154 @@
+---
+title: "BaseRProgramming"
+format: html
+editor: visual
+---
+
+### Task 1: Basic Vector practice
+
+First, I will be creating my different vectors for the pre and post treatments and then applying names to each corresponding subject. Then I will subtract them to get a difference.
+```{r}
+pre_bp <- c( 130, 128, 116, 124, 133, 134, 118, 126, 114, 127, 141, 138, 128, 140, 137, 131, 120, 128, 139, 135)
+post_bp <- c(114, 98, 113, 99, 107, 116, 113, 111, 119, 117, 101, 119, 130, 122, 106, 106, 124, 102, 117, 113)
+patient <- paste("Subject", 1:20, sep = "_")
+names(pre_bp) <- patient
+names(post_bp) <- patient
+diff_bp <- (pre_bp - post_bp)
+diff_bp
+```
+
+Now I will calculate the average decrease in blood pressure across all patients.
+```{r}
+mean(diff_bp)
+```
+Now I will determine which patients experienced a decrease in blood pressure after treatment.
+
+```{r}
+which(diff_bp > 0)
+```
+Now I am subsetting the vector of differences to only return those that have a positive change, and then finding the average decrease in blood pressure for those where the blood pressure decreased.
+
+```{r}
+positive_change <- diff_bp[diff_bp > 0]
+positive_change
+mean(positive_change)
+```
+### Task 2: Basic Data Frame practice 
+I will create a data frame object from my data above.
+```{r}
+my_df <- data.frame(patient, pre_bp, post_bp, diff_bp)
+head(my_df)
+```
+
+I will now subset my data frame to return only rows where the diff_bp column is negative:
+```{r}
+subset(my_df,my_df$diff_bp < 0)
+```
+
+I will add a new column to the data frame that corresponds to the post_bp being less than 120. Then I will print the data frame.
+
+```{r}
+my_df$low_post_bp <- (my_df$post_bp < 120)
+knitr::kable(my_df)
+```
+
+
+
+
+### Task 3: List practice  
+Now I will create a new data frame with new data involving a placebo.
+
+```{r}
+pre_bp <- c(138, 135, 147, 117, 152, 134, 114, 121, 131, 130)
+post_bp <- c(105, 136, 123, 130, 134, 143, 135, 139, 120, 124)
+patient <- paste("Subject", 1:10, sep = "_")
+names(pre_bp) <- patient
+names(post_bp) <- patient
+diff_bp <- (pre_bp - post_bp)
+placebo_df <- data.frame(patient, pre_bp, post_bp, diff_bp)
+placebo_df$low_post_bp <- (placebo_df$post_bp < 120)
+
+my_list <- list(treatment = my_df, placebo = placebo_df)
+```
+
+Now, I will access the first element using three different types of syntax:
+
+```{r}
+my_list$treatment
+my_list[[1]]
+my_list[1]
+```
+
+Now in one line I will access the placebo data frame, pre_bp column.
+
+```{r}
+my_list$placebo$pre_bp
+```
+
+### Task 4: Control Flow practice
+I will first start by creating a column called status
+```{r}
+my_list$treatment$status <- character(20)
+my_list$placebo$status <- character(10)
+```
+
+Now I will use a for loop to characterize the blood pressure measurement for the treatment df in my list.
+```{r}
+for (i in seq_len(nrow(my_list$treatment)))
+  {
+  if (my_list$treatment$post_bp[i] <= 120){
+    my_list$treatment$status[i] = "optimal"}
+  else if (my_list$treatment$post_bp[i] <= 130){
+    my_list$treatment$status[i] = "borderline"}
+  else if (my_list$treatment$post_bp[i] > 130){
+    my_list$treatment$status[i] = "high"}
+}
+```
+
+Now I will repeat this for the placebo data frame.
+```{r}
+for (i in seq_len(nrow(my_list$placebo)))
+  {
+  if (my_list$placebo$post_bp[i] <= 120){
+    my_list$placebo$status[i] = "optimal"}
+  else if (my_list$placebo$post_bp[i] <= 130){
+    my_list$placebo$status[i] = "borderline"}
+  else if (my_list$placebo$post_bp[i] > 130){
+    my_list$placebo$status[i] = "high"}
+}
+my_list
+```
+### Task 5: Function Writing
+```{r}
+prac_func <- function(list, stat = "mean"){
+  my_fun <- get(stat)
+
+  stat_pre_bp1 <- my_fun(list[[1]][,"pre_bp"])
+  stat_post_bp1 <- my_fun(list[[1]][,"post_bp"])
+  stat_diff_bp1 <- my_fun(list[[1]][,"diff_bp"])
+  stat_pre_bp2 <- my_fun(list[[2]][,"pre_bp"])
+  stat_post_bp2 <- my_fun(list[[2]][,"post_bp"])
+  stat_diff_bp2 <- my_fun(list[[2]][,"diff_bp"])
+
+  df1 <- c(stat_pre_bp1,stat_post_bp1,stat_diff_bp1)
+  df2 <- c(stat_pre_bp2,stat_post_bp2,stat_diff_bp2)
+  names(df1) <- paste(stat,c("pre_bp","post_bp","diff_bp"),names(list)[1],sep="_")
+  names(df2) <- paste(stat,c("pre_bp","post_bp","diff_bp"),names(list)[2],sep="_")
+
+ return(list("Element 1 Statistics" = df1, "Element 2 Statistics"= df2))
+}
+```
+
+Now I will apply the function to my list from before:
+
+```{r}
+prac_func(my_list)
+```
+Now I will apply different functions to my list:
+```{r}
+prac_func(my_list, stat = "var")
+prac_func(my_list, stat = "sd")
+prac_func(my_list, stat = "min")
+prac_func(my_list, stat = "max")
+```
+
