@@ -121,20 +121,23 @@ my_list
 ### Task 5: Function Writing
 ```{r}
 prac_func <- function(list, stat = "mean"){
+# first I will tell the function to obtain the specified statistic  
   my_fun <- get(stat)
-
+# now I will access each column within each element and calculate the statistic
   stat_pre_bp1 <- my_fun(list[[1]][,"pre_bp"])
   stat_post_bp1 <- my_fun(list[[1]][,"post_bp"])
   stat_diff_bp1 <- my_fun(list[[1]][,"diff_bp"])
   stat_pre_bp2 <- my_fun(list[[2]][,"pre_bp"])
   stat_post_bp2 <- my_fun(list[[2]][,"post_bp"])
   stat_diff_bp2 <- my_fun(list[[2]][,"diff_bp"])
-
+# I will create my first data frame with all the statistics from element one
   df1 <- c(stat_pre_bp1,stat_post_bp1,stat_diff_bp1)
+# I will create my second data frame with all the statistics from element two
   df2 <- c(stat_pre_bp2,stat_post_bp2,stat_diff_bp2)
+# Now I will update the names to include the statistic for easier readability
   names(df1) <- paste(stat,c("pre_bp","post_bp","diff_bp"),names(list)[1],sep="_")
   names(df2) <- paste(stat,c("pre_bp","post_bp","diff_bp"),names(list)[2],sep="_")
-
+# Now i will return the statistics separating by the different elements
  return(list("Element 1 Statistics" = df1, "Element 2 Statistics"= df2))
 }
 ```
